@@ -4,6 +4,7 @@
  *  Copyright 2014 skp19
  *
  *  modified 2015-06-04 :  thrash99er  - changed bool comparsions from string to bool  i.e.  "true" to true
+ *  modified 2019-01-02 :  ross-p-smith- removed 'true' comparisons completely and Fixed the Take picture.
  *
  * 
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -172,7 +173,7 @@ metadata {
 def take() {
 	log.debug("Taking Photo")
 	sendEvent(name: "hubactionMode", value: "s3");
-    if(hdcamera == true) {
+    if(hdcamera) {
 		hubGet("cmd=snapPicture2")
     }
     else {
@@ -195,7 +196,7 @@ def toggleAlarm() {
 def alarmOn() {
 	log.debug "Enabling Alarm"
     sendEvent(name: "alarmStatus", value: "on");
-    if(hdcamera == true) {
+    if(hdcamera) {
        hubGet("cmd=setMotionDetectConfig&isEnable=1")
     }
     else {
@@ -206,7 +207,7 @@ def alarmOn() {
 def alarmOff() {
 	log.debug "Disabling Alarm"
     sendEvent(name: "alarmStatus", value: "off");
-    if(hdcamera == true) {
+    if(hdcamera) {
 		hubGet("cmd=setMotionDetectConfig&isEnable=0")
     }
     else {
@@ -236,7 +237,7 @@ def toggleLED() {
 def ledOn() {
     log.debug("LED changed to: on")
     sendEvent(name: "ledStatus", value: "on");
-    if(hdcamera == true) {
+    if(hdcamera) {
 	    delayBetween([hubGet("cmd=setInfraLedConfig&mode=1"), hubGet("cmd=openInfraLed")])
     }
     else {
@@ -247,7 +248,7 @@ def ledOn() {
 def ledOff() {
     log.debug("LED changed to: off")
     sendEvent(name: "ledStatus", value: "off");
-    if(hdcamera == "true") {
+    if(hdcamera) {
     	delayBetween([hubGet("cmd=setInfraLedConfig&mode=1"), hubGet("cmd=closeInfraLed")])
     }
     else {
@@ -258,7 +259,7 @@ def ledOff() {
 def ledAuto() {
     log.debug("LED changed to: auto")
     sendEvent(name: "ledStatus", value: "auto");
-	if(hdcamera == true) {
+	if(hdcamera) {
 		hubGet("cmd=setInfraLedConfig&mode=0")
     }
     else {
@@ -270,7 +271,7 @@ def ledAuto() {
 //PRESET ACTIONS
 def preset1() {
 	log.debug("Preset 1 Selected - ${preset1}")
-	if(hdcamera == true) {
+	if(hdcamera) {
 		hubGet("cmd=ptzGotoPresetPoint&name=${preset1}")
     }
     else {
@@ -280,7 +281,7 @@ def preset1() {
 
 def preset2() {
 	log.debug("Preset 2 Selected - ${preset2}")
-	if(hdcamera == true) {
+	if(hdcamera) {
 		hubGet("cmd=ptzGotoPresetPoint&name=${preset2}")
     }
     else {
@@ -290,7 +291,7 @@ def preset2() {
 
 def preset3() {
 	log.debug("Preset 3 Selected - ${preset3}")
-	if(hdcamera == true) {
+	if(hdcamera) {
 		hubGet("cmd=ptzGotoPresetPoint&name=${preset3}")
     }
     else {
@@ -302,7 +303,7 @@ def preset3() {
 //CRUISE ACTIONS
 def cruisemap1() {
 	log.debug("Cruise Map 1 Selected - ${cruisemap1}")
-	if(hdcamera == true) {
+	if(hdcamera) {
 		hubGet("cmd=ptzStartCruise&mapName=${cruisemap1}")
     }
     else {
@@ -312,7 +313,7 @@ def cruisemap1() {
 
 def cruisemap2() {
 	log.debug("Cruise Map 2 Selected - ${cruisemap2}")
-	if(hdcamera == true) {
+	if(hdcamera) {
 		hubGet("cmd=ptzStartCruise&mapName=${cruisemap2}")
     }
     else {
@@ -322,7 +323,7 @@ def cruisemap2() {
 
 def stopCruise() {
 	log.debug("Stop Cruise")
-	if(hdcamera == true) {
+	if(hdcamera) {
 		hubGet("cmd=ptzStopRun")
     }
     else {
@@ -333,11 +334,11 @@ def stopCruise() {
 
 //PTZ CONTROLS
 def left() {
-	if(hdcamera == "true") {
+	if(hdcamera) {
 		delayBetween([hubGet("cmd=ptzMoveLeft"), hubGet("cmd=ptzStopRun")])
     }
     else {
-    	if(mirror == "true") {
+    	if(mirror) {
 	    	hubGet("/decoder_control.cgi?command=4&onestep=1&")
         }
         else {
@@ -347,11 +348,11 @@ def left() {
 }
 
 def right() {
-	if(hdcamera == "true") {
+	if(hdcamera) {
 		delayBetween([hubGet("cmd=ptzMoveRight"), hubGet("cmd=ptzStopRun")])
     }
     else {
-    	if(mirror == "true") {
+    	if(mirror) {
 	    	hubGet("/decoder_control.cgi?command=6&onestep=1&")
         }
         else {
@@ -361,11 +362,11 @@ def right() {
 }
 
 def up() {
-	if(hdcamera == true) {
+	if(hdcamera) {
         delayBetween([hubGet("cmd=ptzMoveUp"), hubGet("cmd=ptzStopRun")])
     }
     else {
-    	if(flip == true) {
+    	if(flip) {
 	    	hubGet("/decoder_control.cgi?command=2&onestep=1&")
         }
         else {
@@ -375,11 +376,11 @@ def up() {
 }
 
 def down() {
-	if(hdcamera == true) {
+	if(hdcamera) {
         delayBetween([hubGet("cmd=ptzMoveDown"), hubGet("cmd=ptzStopRun")])
     }
     else {
-    	if(flip == true) {
+    	if(flip) {
     		hubGet("/decoder_control.cgi?command=0&onestep=1&")
         }
         else {
@@ -393,7 +394,7 @@ def poll() {
 
 	sendEvent(name: "hubactionMode", value: "local");
     //Poll Motion Alarm Status and IR LED Mode
-    if(hdcamera == true) {
+    if(hdcamera) {
 		delayBetween([hubGet("cmd=getMotionDetectConfig"), hubGet("cmd=getInfraLedConfig")])
     }
     else {
@@ -402,7 +403,7 @@ def poll() {
 }
 
 private getLogin() {
-	if(hdcamera == true) {
+	if(hdcamera) {
     	return "usr=${username}&pwd=${password}&"
     }
     else {
@@ -419,7 +420,7 @@ private hubGet(def apiCommand) {
 
 	log.debug("Executing hubaction on " + getHostAddress())
     def uri = ""
-    if(hdcamera == true) {
+    if(hdcamera) {
     	uri = "/cgi-bin/CGIProxy.fcgi?" + getLogin() + apiCommand
 	}
     else {
@@ -447,14 +448,18 @@ def parse(String description) {
     def descMap = parseDescriptionAsMap(description)
         
     //Image
-	if (descMap["bucket"] && descMap["key"]) {
-		putImageInS3(descMap)
+	if (descMap["tempImageKey"]) {
+		try {
+            storeTemporaryImage(descMap.tempImageKey, getPictureName())
+        } catch (Exception e) {
+            log.error e
+        }
 	}
 
 	//Status Polling
     else if (descMap["headers"] && descMap["body"]) {
         def body = new String(descMap["body"].decodeBase64())
-        if(hdcamera == true) {
+        if(hdcamera) {
             def langs = new XmlSlurper().parseText(body)
 
             def motionAlarm = "$langs.isEnable"
@@ -501,32 +506,9 @@ def parseDescriptionAsMap(description) {
 	}
 }
 
-def putImageInS3(map) {
-
-	def s3ObjectContent
-
-	try {
-		def imageBytes = getS3Object(map.bucket, map.key + ".jpg")
-
-		if(imageBytes)
-		{
-			s3ObjectContent = imageBytes.getObjectContent()
-			def bytes = new ByteArrayInputStream(s3ObjectContent.bytes)
-			storeImage(getPictureName(), bytes)
-		}
-	}
-	catch(Exception e) {
-		log.error e
-	}
-	finally {
-		//Explicitly close the stream
-		if (s3ObjectContent) { s3ObjectContent.close() }
-	}
-}
-
 private getPictureName() {
   def pictureUuid = java.util.UUID.randomUUID().toString().replaceAll('-', '')
-  "image" + "_$pictureUuid" + ".jpg"
+  return "image" + "_$pictureUuid" + ".jpg"
 }
 
 private getHostAddress() {
